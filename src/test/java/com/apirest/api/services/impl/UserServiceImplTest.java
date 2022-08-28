@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,13 +23,15 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class UserServiceImplTest {
- public static final Integer ID      = 1;
- public static final String NAME     = "Karine";
+    public static final Integer ID = 1;
+    public static final String NAME = "Karine";
 
- public static final String EMAIL    = "ka@email.com";
- public static final String PASSWORD = "123";
+    public static final String EMAIL = "ka@email.com";
+    public static final String PASSWORD = "123";
+    public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
+    public static final int INDEX = 0;
 
- @InjectMocks
+    @InjectMocks
     private UserServiceImpl service;
 
     @Mock
@@ -43,14 +46,14 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-     MockitoAnnotations.openMocks(this);
-     startUser();
+        MockitoAnnotations.openMocks(this);
+        startUser();
     }
 
     @DisplayName("deve buscar Id e retornar a instancia de usuario")
     @Test
     void testarBuscarPorIdRetornandoInstanciaDeUsuario() {
-       when(repository.findById(anyInt())).thenReturn(optionalUser);
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
 
         User response = service.findById(ID);
 
@@ -63,23 +66,39 @@ class UserServiceImplTest {
 
 
     }
-   @DisplayName("deve buscar Id e retornar objeto nao encontrado")
+
+    @DisplayName("deve buscar Id e retornar objeto nao encontrado")
     @Test
     void testarExceptionDeObjNaoEncontrado() {
-        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
 
-        try{
+        try {
             service.findById(ID);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             assertEquals(ObjectNotFoundException.class, ex.getClass());
-            assertEquals("Objeto não encontrado", ex.getMessage());
+            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
         }
 
 
     }
 
+    @DisplayName("deve retornar lista de Usuarios")
     @Test
-    void findAll() {
+    void testarBuscarTodaListaDeUser() {
+        when(repository.findAll()).thenReturn(List.of(user));
+
+        List<User> response = service.findAll();
+
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals(User.class, response.get(INDEX).getClass());
+
+        assertEquals(ID, response.get(INDEX).getId());
+        assertEquals(NAME, response.get(INDEX).getName());
+        assertEquals(EMAIL, response.get(INDEX).getEmail());
+        assertEquals(PASSWORD, response.get(INDEX).getPassword());
+
+
     }
 
     @Test
@@ -95,9 +114,9 @@ class UserServiceImplTest {
     }
 
     private void startUser() {
-     user = new User(ID, NAME, EMAIL, PASSWORD);
-     userDTO = new UserDTO(ID, NAME, EMAIL, PASSWORD);
-     optionalUser = Optional.of(new User(ID, NAME, EMAIL, PASSWORD));
+        user = new User(ID, NAME, EMAIL, PASSWORD);
+        userDTO = new UserDTO(ID, NAME, EMAIL, PASSWORD);
+        optionalUser = Optional.of(new User(ID, NAME, EMAIL, PASSWORD));
 
     }
 }
