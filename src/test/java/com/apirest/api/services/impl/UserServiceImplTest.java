@@ -3,6 +3,7 @@ package com.apirest.api.services.impl;
 import com.apirest.api.domain.User;
 import com.apirest.api.domain.dto.UserDTO;
 import com.apirest.api.repositories.UserRepository;
+import com.apirest.api.services.exceptions.DataIntegratyViolationException;
 import com.apirest.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -101,8 +102,33 @@ class UserServiceImplTest {
 
     }
 
+    @DisplayName("deve criar o User")
     @Test
-    void create() {
+    void createUser() {
+        when(repository.save(any())).thenReturn(user);
+
+        User response = service.create(userDTO);
+
+        assertNotNull(response);
+        assertEquals(User.class, response.getClass());
+        assertEquals(ID, response.getId());
+        assertEquals(NAME, response.getName());
+        assertEquals(EMAIL, response.getEmail());
+        assertEquals(PASSWORD, response.getPassword());
+    }
+
+    @DisplayName("deve dar erro ao criar o User")
+    @Test
+    void erroParaCreateUser() {
+        when(repository.findByEmail(anyString())).thenReturn(optionalUser);
+
+        try {
+            optionalUser.get().setId(2);
+            service.create(userDTO);
+        } catch (Exception ex) {
+            assertEquals(DataIntegratyViolationException.class, ex.getClass());
+            assertEquals("Email já cadastrado no sistema", ex.getMessage());
+        }
     }
 
     @Test
