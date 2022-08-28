@@ -3,7 +3,9 @@ package com.apirest.api.services.impl;
 import com.apirest.api.domain.User;
 import com.apirest.api.domain.dto.UserDTO;
 import com.apirest.api.repositories.UserRepository;
+import com.apirest.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -45,6 +47,7 @@ class UserServiceImplTest {
      startUser();
     }
 
+    @DisplayName("deve buscar Id e retornar a instancia de usuario")
     @Test
     void testarBuscarPorIdRetornandoInstanciaDeUsuario() {
        when(repository.findById(anyInt())).thenReturn(optionalUser);
@@ -57,6 +60,21 @@ class UserServiceImplTest {
         assertEquals(ID, response.getId());
         assertEquals(NAME, response.getName());
         assertEquals(EMAIL, response.getEmail());
+
+
+    }
+   @DisplayName("deve buscar Id e retornar objeto nao encontrado")
+    @Test
+    void testarExceptionDeObjNaoEncontrado() {
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+
+        try{
+            service.findById(ID);
+        }catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals("Objeto não encontrado", ex.getMessage());
+        }
+
 
     }
 
