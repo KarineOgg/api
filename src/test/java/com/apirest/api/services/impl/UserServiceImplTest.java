@@ -64,8 +64,6 @@ class UserServiceImplTest {
         assertEquals(ID, response.getId());
         assertEquals(NAME, response.getName());
         assertEquals(EMAIL, response.getEmail());
-
-
     }
 
     @DisplayName("deve buscar Id e retornar objeto nao encontrado")
@@ -79,8 +77,6 @@ class UserServiceImplTest {
             assertEquals(ObjectNotFoundException.class, ex.getClass());
             assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
         }
-
-
     }
 
     @DisplayName("deve retornar lista de Usuarios")
@@ -98,13 +94,11 @@ class UserServiceImplTest {
         assertEquals(NAME, response.get(INDEX).getName());
         assertEquals(EMAIL, response.get(INDEX).getEmail());
         assertEquals(PASSWORD, response.get(INDEX).getPassword());
-
-
     }
 
     @DisplayName("deve criar o User")
     @Test
-    void createUser() {
+    void testarCriarUserComSucesso() {
         when(repository.save(any())).thenReturn(user);
 
         User response = service.create(userDTO);
@@ -119,7 +113,7 @@ class UserServiceImplTest {
 
     @DisplayName("deve dar erro ao criar o User")
     @Test
-    void erroParaCreateUser() {
+    void testarErroParaCriarUser() {
         when(repository.findByEmail(anyString())).thenReturn(optionalUser);
 
         try {
@@ -131,9 +125,22 @@ class UserServiceImplTest {
         }
     }
 
+    @DisplayName("deve fazer update")
     @Test
-    void update() {
+    void testarUpdateComSucesso() {
+        when(repository.save(any())).thenReturn(user);
+
+        User response = service.update(userDTO);
+
+        assertNotNull(response);
+        assertEquals(User.class, response.getClass());
+        assertEquals(ID, response.getId());
+        assertEquals(NAME, response.getName());
+        assertEquals(EMAIL, response.getEmail());
+        assertEquals(PASSWORD, response.getPassword());
+
     }
+
 
     @Test
     void delete() {
@@ -143,6 +150,5 @@ class UserServiceImplTest {
         user = new User(ID, NAME, EMAIL, PASSWORD);
         userDTO = new UserDTO(ID, NAME, EMAIL, PASSWORD);
         optionalUser = Optional.of(new User(ID, NAME, EMAIL, PASSWORD));
-
     }
 }
