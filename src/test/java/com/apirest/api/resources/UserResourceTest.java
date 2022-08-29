@@ -27,11 +27,11 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class UserResourceTest {
 
-    public static final Integer ID      = 1;
-    public static final Integer INDEX   = 0;
-    public static final String NAME     = "Karine";
+    public static final Integer ID = 1;
+    public static final Integer INDEX = 0;
+    public static final String NAME = "Karine";
 
-    public static final String EMAIL    = "ka@mail.com";
+    public static final String EMAIL = "ka@mail.com";
     public static final String PASSWORD = "123";
 
     private User user;
@@ -74,25 +74,25 @@ class UserResourceTest {
 
     }
 
-   @DisplayName("deve retornar todos Usuarios DTO")
+    @DisplayName("deve retornar todos Usuarios DTO")
     @Test
     void testarBuscarTodosUserDTO() {
         when(service.findAll()).thenReturn(List.of(user));
         when(mapper.map(any(), any())).thenReturn(userDTO);
 
-       ResponseEntity<List<UserDTO>> response = resource.findAll();
+        ResponseEntity<List<UserDTO>> response = resource.findAll();
 
-       assertNotNull(response);
-       assertNotNull(response.getBody());
-       assertEquals(HttpStatus.OK, response.getStatusCode());
-       assertEquals(ResponseEntity.class, response.getClass());
-       assertEquals(ArrayList.class, response.getBody().getClass());
-       assertEquals(UserDTO.class, response.getBody().get(INDEX).getClass());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResponseEntity.class, response.getClass());
+        assertEquals(ArrayList.class, response.getBody().getClass());
+        assertEquals(UserDTO.class, response.getBody().get(INDEX).getClass());
 
-       assertEquals(ID, response.getBody().get(INDEX).getId());
-       assertEquals(NAME, response.getBody().get(INDEX).getName());
-       assertEquals(EMAIL, response.getBody().get(INDEX).getEmail());
-       assertEquals(PASSWORD, response.getBody().get(INDEX).getPassword());
+        assertEquals(ID, response.getBody().get(INDEX).getId());
+        assertEquals(NAME, response.getBody().get(INDEX).getName());
+        assertEquals(EMAIL, response.getBody().get(INDEX).getEmail());
+        assertEquals(PASSWORD, response.getBody().get(INDEX).getPassword());
 
     }
 
@@ -101,22 +101,39 @@ class UserResourceTest {
     void testarCriarUserDTO() {
         when(service.create(any())).thenReturn(user);
 
-        ResponseEntity<UserDTO> response= resource.create(userDTO);
+        ResponseEntity<UserDTO> response = resource.create(userDTO);
 
         assertEquals(ResponseEntity.class, response.getClass());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().get("Location"));
 
-
     }
 
+    @DisplayName("deve fazer alteracao com sucesso")
     @Test
-    void update() {
+    void testarUpdate() {
+        when(service.update(userDTO)).thenReturn(user);
+        when(mapper.map(any(), any())).thenReturn(userDTO);
+
+        ResponseEntity<UserDTO> response = resource.update(ID, userDTO);
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(ResponseEntity.class, response.getClass());
+        assertEquals(UserDTO.class, response.getBody().getClass());
+
+
+        assertEquals(ID, response.getBody().getId());
+        assertEquals(NAME, response.getBody().getName());
+        assertEquals(EMAIL, response.getBody().getEmail());
+
     }
 
     @Test
     void delete() {
     }
+
     private void startUser() {
         user = new User(ID, NAME, EMAIL, PASSWORD);
         userDTO = new UserDTO(ID, NAME, EMAIL, PASSWORD);
