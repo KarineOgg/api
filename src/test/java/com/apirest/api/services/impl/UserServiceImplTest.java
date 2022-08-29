@@ -141,6 +141,7 @@ class UserServiceImplTest {
         assertEquals(PASSWORD, response.getPassword());
 
     }
+
     @DisplayName("deve dar erro ao atualizar  User")
     @Test
     void testarErroParaUpdateUser() {
@@ -163,6 +164,20 @@ class UserServiceImplTest {
         doNothing().when(repository).deleteById(anyInt());
         service.delete(ID);
         verify(repository, times(1)).deleteById(anyInt());
+    }
+
+    @DisplayName("deve dar erro ao deletar User")
+    @Test
+    void testarErroParaDeletarUser() {
+        when(repository.findById(anyInt()))
+                .thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
+
+        try {
+            service.delete(ID);
+        }catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
+        }
     }
 
     private void startUser() {
